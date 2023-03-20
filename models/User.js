@@ -11,7 +11,7 @@ const userSchema = new Schema(
       type: String,
       required: true,
       unique: true,
-      trimm: true,
+      trim: true,
       maxlength: 50,
       minlength: 4,
     },
@@ -40,6 +40,7 @@ const userSchema = new Schema(
     },
     id: false,
   }
+  // Create the friendCount virtual to retrieve the length of the users friends array
 );
 
 const User = model('user', userSchema)
