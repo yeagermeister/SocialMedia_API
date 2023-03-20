@@ -30,8 +30,7 @@ module.exports = {
     User.find()
       .then(async (users) => {
         const userObj = {
-          users,
-          headCount: await headCount(),
+          users
         };
         return res.json(userObj);
       })
@@ -49,8 +48,7 @@ module.exports = {
         !user
           ? res.status(404).json({ message: 'No user with that ID' })
           : res.json({
-              user,
-              grade: await grade(req.params.userId),
+              user
             })
       )
       .catch((err) => {
