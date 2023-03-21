@@ -16,10 +16,11 @@ const reactionSchema = new Schema(
       type: Date,
       default: Date.now,
     },
-    username: [{
-      type: Schema.Types.ObjectId,
-      ref: 'User',
-    }],
+    username: [userSchema],
+      // {
+  //     type: Schema.Types.ObjectId,
+  //     ref: 'User',
+  //   }],
   },
   {
     toJSON: {
@@ -29,6 +30,6 @@ const reactionSchema = new Schema(
   }
 );
 
-const Reaction = model('reaction', reactionSchema);
+// const Reaction = model('reaction', reactionSchema);
 
-module.exports = Reaction;
+module.exports = reactionSchema;

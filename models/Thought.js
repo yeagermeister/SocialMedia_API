@@ -1,6 +1,6 @@
 const { Schema, Types, model } = require('mongoose');
 const userSchema = require('./User');
-const reactionSchema = require('./Reaction');
+// const reactionSchema = require('./Reaction');
 
 // Schema to create Student model
 const thoughtSchema = new Schema(
@@ -32,10 +32,17 @@ const thoughtSchema = new Schema(
   {
     toJSON: {
       getters: true,
+      virtuals: true,
     },
+    id: false,
   }
-  // create a reactionCount virtual to retrieve the length of the reactions array.
 );
+  //reactionCount virtual to retrieve the length of the reactions array.
+thoughtSchema
+  .virtual('reactionCount')
+  .get(function() {
+    return this.reactions.length;
+  })
 
 const Thought = model('Thought', thoughtSchema);
 

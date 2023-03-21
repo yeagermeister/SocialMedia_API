@@ -41,8 +41,8 @@ module.exports = {
   },
   // Get a single user
   getSingleUser(req, res) {
-    User.findOne({ _id: req.params.userId })
-      .select('-__v')
+    User.findOne({ _id: req.params.userId})
+      // .select('-__v')
       .lean()
       .then(async (user) =>
         !user
