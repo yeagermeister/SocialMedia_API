@@ -73,6 +73,13 @@ module.exports = {
       let updateAction;
       if (req.body.friends) {
         updateAction = { $push: req.body }; // Add a friend if a friendId is provided
+        // adding this section to put the reciprocal friend relationship in place
+        User.findOneAndUpdate(
+          {_id: req.body.friends},
+          {$push: {"friends": req.params.userId}},
+          { new: true, runValidators: true }
+        )
+        .catch((err) => res.status(500).json(err));
       } else {
         updateAction = { $set: req.body}; // Update user information if no friendId is provided
       };

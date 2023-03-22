@@ -1,55 +1,115 @@
-const { Course, Student } = require('../models');
+
+const { User, Thought } = require('../models');
+const { trimId } = require('../helpers/helpers');
 
 module.exports = {
-  // Get all courses
-  getCourses(req, res) {
-    Course.find()
-      .then((courses) => res.json(courses))
-      .catch((err) => res.status(500).json(err));
-  },
-  // Get a course
-  getSingleCourse(req, res) {
-    Course.findOne({ _id: req.params.courseId })
-      .select('-__v')
-      .then((course) =>
-        !course
-          ? res.status(404).json({ message: 'No course with that ID' })
-          : res.json(course)
-      )
-      .catch((err) => res.status(500).json(err));
-  },
-  // Create a course
-  createCourse(req, res) {
-    Course.create(req.body)
-      .then((course) => res.json(course))
+  // Get all thoughts
+  getThoughts(req, res) {
+    Thought.find()
+      .then(async (thoughts) => {
+        const thoughtObj = {
+          thoughts
+        };
+        return res.json(thoughtObj);
+      })
       .catch((err) => {
         console.log(err);
         return res.status(500).json(err);
       });
   },
-  // Delete a course
-  deleteCourse(req, res) {
-    Course.findOneAndDelete({ _id: req.params.courseId })
+  // Get a single thought
+  getSingleThought(req, res) {
+    Thought.findOne({ _id: req.params.thoughtId})
+      // .select('-__v')
+      .lean()
+      .then(async (thought) =>
+        !thought
+          ? res.status(404).json({ message: 'No thought with that ID' })
+          : res.json({
+              thought
+            })
+      )
+      .catch((err) => {
+        console.log(err);
+        return res.status(500).json(err);
+      });
+  },
+  // create a new thought
+  createThought(req, res) {
+    // let id;
+    // User.findOne({username: req.body.username})
+    //   .lean()
+    //   .then(async (user) => {
+    //     if (!user) {
+    //       res.status(404).json({ message: 'No user with that ID' })
+    //     }
+    //     id = trimId(user._id);
+    //     req.body['username'] = id;
+        console.log(req.body);
+        Thought.create(req.body)
+          .then((thought) => res.json(thought))
+          .catch((err) => res.status(500).json(err));
+      },
+      // .catch((err) => {
+      //   console.log(err);
+      //   return res.status(500).json(err);
+      // });
+    // delete req.body.username;
+    // console.log(id)
+    // const newId = {"username": id }
+    // req.body = {...req.body,...newId}
+    // console.log(req.body);
+    // Thought.create(req.body)
+    //   .then((thought) => res.json(thought))
+    //   .catch((err) => res.status(500).json(err));
+  
+  // Delete a thought
+  deleteThought(req, res) {
+    Thought.findOneAndRemove({ _id: req.params.thoughtId })
+      .then((thought) =>
+        !thought
+          ? res.status(404).json({ message: 'No such thought exists' })
+      //     : res.json({ message: 'Thought successfully deleted' })
+      // )
+          : Thought.findOneAndRemove(
+              { thoughts: req.params.thoughtId },
+              { $pull: { thoughts: req.params.thoughtId } },
+              { new: true }
+            )
+      )
       .then((course) =>
         !course
-          ? res.status(404).json({ message: 'No course with that ID' })
-          : Student.deleteMany({ _id: { $in: course.students } })
+          ? res.status(404).json({
+              message: 'Thought deleted, but no reactions found',
+            })
+          : res.json({ message: 'Thought successfully deleted' })
       )
-      .then(() => res.json({ message: 'Course and students deleted!' }))
-      .catch((err) => res.status(500).json(err));
+      .catch((err) => {
+        console.log(err);
+        res.status(500).json(err);
+      });
   },
-  // Update a course
-  updateCourse(req, res) {
-    Course.findOneAndUpdate(
-      { _id: req.params.courseId },
-      { $set: req.body },
-      { runValidators: true, new: true }
-    )
-      .then((course) =>
-        !course
-          ? res.status(404).json({ message: 'No course with this id!' })
-          : res.json(course)
+  updateThought(req, res) {
+    if ((req.body.friends && req.body.thoughtname) || (req.body.friends && req.body.email)) {
+      res.status(404).json({message: 'Please seperate account updates from friend additions'})
+    } else {
+      let updateAction;
+      if (req.body.friends) {
+        updateAction = { $push: req.body }; // Add a friend if a friendId is provided
+      } else {
+        updateAction = { $set: req.body}; // Update thought information if no friendId is provided
+      };
+      Thought.findOneAndUpdate(
+        { _id: req.params.thoughtId },
+        updateAction,
+        { new: true, runValidators: true }
+      )
+      .then((thought) =>
+      !thought
+        ? res.status(404).json({ message: 'No thought with this id!' })
+        : res.json(thought)
       )
       .catch((err) => res.status(500).json(err));
-  },
+    }
+  }
 };

@@ -1,14 +1,14 @@
 const { Schema, Types, model } = require('mongoose');
+const reactionSchema = require('./Reaction');
 const userSchema = require('./User');
-// const reactionSchema = require('./Reaction');
 
 // Schema to create Student model
 const thoughtSchema = new Schema(
   {
-    thoughID:{
-      type: Schema.Types.ObjectId,
-      default: () => new Types.ObjectId(),
-    },
+    // thoughID:{
+    //   type: Schema.Types.ObjectId,
+    //   default: () => new Types.ObjectId(),
+    // },
     thoughtText: {
       type: String,
       required: true,
@@ -19,14 +19,17 @@ const thoughtSchema = new Schema(
       type: Date,
       default: Date.now,
     },
-    username: [{
-      type: Schema.Types.ObjectId,
-      ref: 'User',
-    }],
-    reactions: [{
-      type: Schema.Types.ObjectId,
-      ref: 'Reaction',
-    }],
+    username: {
+      // type: Schema.Types.String,
+      // ref: 'User',
+      type: String,
+      required: true,
+    },
+    reactions: [reactionSchema]
+    //   {
+    //   type: Schema.Types.ObjectId,
+    //   ref: 'Reaction',
+    // }],
 
   },
   {
