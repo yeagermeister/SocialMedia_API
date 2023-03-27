@@ -3,10 +3,6 @@ const thoughtSchema = require('./Thought');
 
 const userSchema = new Schema(
   {
-    // userId: {
-    //   type: Schema.Types.ObjectId,
-    //   default: () => new Types.ObjectId(),
-    // },
     username: {
       type: String,
       required: true,
@@ -29,10 +25,6 @@ const userSchema = new Schema(
       type: Schema.Types.ObjectId,
       ref: 'User',
     }],
-    // createdAt: {
-    //   type: Date,
-    //   default: Date.now,
-    // },
   },
   {
     toJSON: {

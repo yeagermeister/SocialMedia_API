@@ -1,7 +1,7 @@
 
 const { User, Thought } = require('../models');
 const { trimId } = require('../helpers/helpers');
-const { myUser }= require('./userController')
+// const { myUser }= require('./userController')
 
 module.exports = {
   // Get all thoughts
@@ -37,24 +37,31 @@ module.exports = {
   },
   // create a new thought
   createThought(req, res) {
-    if (!req.body.username) {
-      res.status(500).json(`Please provide a username`)
-    } else {
-      Thought.create(req.body)
-      .then((thought) => {res.json(thought);})
-      .catch((err) => res.status(500).json(err));
-    }
+    Thought.create(req.body)
+      .then((thought) => {
+        let thoughtId = trimId(thought._id);
+        return User.findOneAndUpdate(
+          { username: req.body.username },
+          { $addToSet: { thoughts: thoughtId } },
+          { new: true, runValidators: true }
+        );
+      })
+      .then((user) => {
+        res.json(user);
+      })
+      .catch((err) => {
+        res.status(500).json(err);
+      });
   },
 
-  
   // Delete a thought
   deleteThought(req, res) {
     Thought.findOneAndRemove({ _id: req.params.thoughtId })
       .then((thought) =>
         !thought
           ? res.status(404).json({ message: 'No such thought exists' })
-          : Thought.findOneAndRemove(
-              { thoughts: req.params.thoughtId },
+          : User.findOneAndUpdate(
+              { _id: thought.UserId },
               { $pull: { thoughts: req.params.thoughtId } },
               { new: true }
             )
@@ -99,10 +106,10 @@ module.exports = {
   },
   // Remove application tag. This method finds the application based on ID. It then updates the tags array associated with the app in question by removing it's tagId from the tags array.
   removeReaction(req, res) {
-    console.log(req.params.reactionId)
+    console.log(req.body.reactionId)
     Thought.findOneAndUpdate(
       { _id: req.params.thoughtId },
-      { $pull: { reactions: { reactionId: req.params.reactionId } } },
+      { $pull: { reactions: { reactionId: req.body.reactionId } } },
       { runValidators: true, new: true }
     )
       .then((thought) =>
