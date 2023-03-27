@@ -1,36 +1,26 @@
-const { Schema, Types, model } = require('mongoose');
-const reactionSchema = require('./Reaction');
-const userSchema = require('./User');
+const { Schema, model } = require('mongoose');
+const Reaction = require('./Reaction');
+// const userSchema = require('./User');
 
 // Schema to create Student model
 const thoughtSchema = new Schema(
   {
-    // thoughID:{
-    //   type: Schema.Types.ObjectId,
-    //   default: () => new Types.ObjectId(),
-    // },
     thoughtText: {
       type: String,
       required: true,
       min_length: 1,
       max_length: 280,
+      mutable: true
     },    
     createdAt: {
       type: Date,
       default: Date.now,
     },
     username: {
-      // type: Schema.Types.String,
-      // ref: 'User',
       type: String,
       required: true,
     },
-    reactions: [reactionSchema]
-    //   {
-    //   type: Schema.Types.ObjectId,
-    //   ref: 'Reaction',
-    // }],
-
+    reactions: [Reaction],
   },
   {
     toJSON: {
@@ -38,6 +28,7 @@ const thoughtSchema = new Schema(
       virtuals: true,
     },
     id: false,
+
   }
 );
   //reactionCount virtual to retrieve the length of the reactions array.

@@ -1,5 +1,3 @@
-// ObjectId() method for converting userId string into an ObjectId for querying database
-// const { ObjectId } = require('mongoose').Types;
 const { User, Thought } = require('../models');
 
 module.exports = {
@@ -20,7 +18,6 @@ module.exports = {
   // Get a single user
   getSingleUser(req, res) {
     User.findOne({ _id: req.params.userId})
-      // .select('-__v')
       .lean()
       .then(async (user) =>
         !user
@@ -46,16 +43,14 @@ module.exports = {
       .then((user) =>
         !user
           ? res.status(404).json({ message: 'No such user exists' })
-      //     : res.json({ message: 'User successfully deleted' })
-      // )
           : Thought.findOneAndRemove(
               { users: req.params.userId },
               { $pull: { users: req.params.userId } },
               { new: true }
             )
       )
-      .then((course) =>
-        !course
+      .then((thought) =>
+        !thought
           ? res.status(404).json({
               message: 'User deleted, but no thoughts found',
             })
@@ -66,34 +61,21 @@ module.exports = {
         res.status(500).json(err);
       });
   },
+// updateUser accounts for friend and thought addition as well as updates to the username or email address.
   updateUser(req, res) {
-    if ((req.body.friends && req.body.username) || (req.body.friends && req.body.email)) {
-      res.status(404).json({message: 'Please seperate account updates from friend additions'})
-    } else {
-      let updateAction;
-      if (req.body.friends) {
-        updateAction = { $push: req.body }; // Add a friend if a friendId is provided
-        // adding this section to put the reciprocal friend relationship in place
-        User.findOneAndUpdate(
-          {_id: req.body.friends},
-          {$push: {"friends": req.params.userId}},
-          { new: true, runValidators: true }
-        )
-        .catch((err) => res.status(500).json(err));
-      } else {
-        updateAction = { $set: req.body}; // Update user information if no friendId is provided
-      };
-      User.findOneAndUpdate(
-        { _id: req.params.userId },
-        updateAction,
-        { new: true, runValidators: true }
-      )
-      .then((user) =>
+    User.findOneAndUpdate(
+      { _id: req.params.userId },
+      {
+        $push: {'friends' : req.body.friends, 'thoughts' : req.body.thoughts},
+        $set: {email: req.body.email, username: req.body.username}
+      },
+      { new: true, runValidators: true }
+    )
+    .then((user) =>
       !user
         ? res.status(404).json({ message: 'No user with this id!' })
         : res.json(user)
-      )
-      .catch((err) => res.status(500).json(err));
-    }
+    )
+    .catch((err) => res.status(500).json(err));
   }
 };
