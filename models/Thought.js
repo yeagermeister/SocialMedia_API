@@ -1,6 +1,7 @@
 const { Schema, model } = require('mongoose');
 const Reaction = require('./Reaction');
-// const userSchema = require('./User');
+const { formatDate } = require('../helpers/helpers');
+
 
 // Schema to create Student model
 const thoughtSchema = new Schema(
@@ -37,6 +38,12 @@ thoughtSchema
   .get(function() {
     return this.reactions.length;
   })
+
+thoughtSchema
+  .path('createdAt')
+  .get(function(value) {
+    return formatDate(value);
+  });
 
 const Thought = model('Thought', thoughtSchema);
 

@@ -6,4 +6,11 @@ const trimId = (id) => {
     return result;
 };
 
-module.exports = {trimId: trimId};
+const formatDate = (date) => {
+  newDate = new Date(date).toLocaleString('en', {
+    timeZoneName: 'short',
+  });
+  return newDate;
+};
+
+module.exports = {trimId: trimId, formatDate: formatDate};
