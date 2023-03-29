@@ -1,7 +1,6 @@
 
 const { User, Thought } = require('../models');
 const { trimId } = require('../helpers/helpers');
-// const { myUser }= require('./userController')
 
 module.exports = {
   // Get all thoughts
@@ -18,6 +17,7 @@ module.exports = {
         return res.status(500).json(err);
       });
   },
+
   // Get a single thought
   getSingleThought(req, res) {
     Thought.findOne({ _id: req.params.thoughtId})
@@ -35,6 +35,7 @@ module.exports = {
         return res.status(500).json(err);
       });
   },
+
   // create a new thought
   createThought(req, res) {
     Thought.create(req.body)
@@ -60,24 +61,22 @@ module.exports = {
       .then((thought) =>
         !thought
           ? res.status(404).json({ message: 'No such thought exists' })
+          // This pulls the thought reference from the user
           : User.findOneAndUpdate(
               { _id: thought.UserId },
               { $pull: { thoughts: req.params.thoughtId } },
               { new: true }
             )
       )
-      .then((reaction) =>
-        !reaction
-          ? res.status(404).json({
-              message: 'Thought deleted, but no reactions found',
-            })
-          : res.json({ message: 'Thought successfully deleted' })
+      .then(() =>
+        res.json({ message: 'Thought successfully deleted' })
       )
       .catch((err) => {
         console.log(err);
         res.status(500).json(err);
       });
   },
+  // Update the text of a thought
   updateThought(req, res) {
     Thought.findOneAndUpdate(
       { _id: req.params.thoughtId },
@@ -91,6 +90,7 @@ module.exports = {
     )
     .catch((err) => res.status(500).json(err));
   },
+  // create a reaction
   addReaction(req, res) {
     Thought.findOneAndUpdate(
       { _id: req.params.thoughtId },
@@ -104,9 +104,8 @@ module.exports = {
       )
       .catch((err) => res.status(500).json(err));
   },
-  // Remove application tag. This method finds the application based on ID. It then updates the tags array associated with the app in question by removing it's tagId from the tags array.
+// Delete a reaction
   removeReaction(req, res) {
-    console.log(req.body.reactionId)
     Thought.findOneAndUpdate(
       { _id: req.params.thoughtId },
       { $pull: { reactions: { reactionId: req.body.reactionId } } },

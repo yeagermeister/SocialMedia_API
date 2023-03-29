@@ -61,7 +61,7 @@ module.exports = {
         res.status(500).json(err);
       });
   },
-// updateUser accounts for friend and thought addition as well as updates to the username or email address.
+// Update a username and/or email address
   updateUser(req, res) {
     User.findOneAndUpdate(
       {_id: req.params.userId},
@@ -75,6 +75,7 @@ module.exports = {
     )
     .catch((err) => res.status(500).json(err));
   },
+  // add a friend
   addFriend(req,res) {
     User.findOneAndUpdate(
       {_id: req.params.userId},
@@ -88,8 +89,8 @@ module.exports = {
    )
     .catch((err) => res.status(500).json(err));
   },
+  // delete a friend
   deleteFriend(req,res) {
-    console.log(req.params.userId, req.params.friendId)
     User.findOneAndUpdate(
       { _id: req.params.userId },
       { $pull: { friends: req.params.friendId } },

@@ -3,7 +3,7 @@ const Reaction = require('./Reaction');
 const { formatDate } = require('../helpers/helpers');
 
 
-// Schema to create Student model
+// Schema to create Thought model
 const thoughtSchema = new Schema(
   {
     thoughtText: {
@@ -39,6 +39,7 @@ thoughtSchema
     return this.reactions.length;
   })
 
+// This calls the format date helper that is used in the getter
 thoughtSchema
   .path('createdAt')
   .get(function(value) {

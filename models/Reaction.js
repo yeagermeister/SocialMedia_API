@@ -1,6 +1,6 @@
 const { Schema, Types } = require('mongoose');
-// const userSchema = require('./User');
 
+// Schema for reactions.  This is not a model, but a sub doc.
 const reactionSchema = new Schema(
   {
     reactionId: {
@@ -25,11 +25,8 @@ const reactionSchema = new Schema(
     toJSON: {
       virtuals: true,
     },
-    id: false,
-    _id: false
+    id: false
   }
 );
-
-// const Reaction = model('reaction', reactionSchema);
 
 module.exports = reactionSchema;

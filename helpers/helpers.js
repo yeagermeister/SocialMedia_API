@@ -5,7 +5,7 @@ const trimId = (id) => {
     result = result.slice(1,-1);
     return result;
 };
-
+// Helper function to format a date
 const formatDate = (date) => {
   newDate = new Date(date).toLocaleString('en', {
     timeZoneName: 'short',
